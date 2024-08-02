@@ -1,0 +1,791 @@
+look online as of 2024:
+
+give me all the macos terminal commands and steps to put a new github repo
+
+
+Please analyze this project structure, description, and errors carefully in order to help me with the issue.
+
+.
+├── README.md
+├── all_code.txt
+├── db
+│   └── finance_tracker.db
+├── problem.py
+├── sql
+│   └── create_tables.sql
+└── src
+    ├── __pycache__
+    │   ├── finance_utils.cpython-312.pyc
+    │   ├── init_data.cpython-312.pyc
+    │   ├── transaction_utils.cpython-312.pyc
+    │   └── view_utils.cpython-312.pyc
+    ├── db_utils.py
+    ├── finance_utils.py
+    ├── init_data.py
+    ├── main.py
+    ├── scheduler.py
+    ├── transaction_utils.py
+    ├── verify_db.py
+    └── view_utils.py
+
+5 directories, 17 files
+
+### ./append_code.sh ###
+#!/bin/bash
+
+# Find and append relevant files to all_code.txt excluding .txt files and kubectl
+find . -type f \( -name "*.go" -o -name "*.yaml" -o -name "*.yml" -o -name "*.md" -o -name "*.sh" -o -name "*.sql" -o -name "Jenkinsfile" -o -name "LICENSE" -o -name "dockerfile" -o -name "go.mod" -o -name "go.sum" -o -name "kubeconfig" -o -name "*.py" -o -name "*.log" \) \
+    -not -name "*.txt" \
+    -not -name "kubectl" \
+    -exec sh -c 'echo "### {} ###" >> all_code.txt && cat "{}" >> all_code.txt' \;
+
+echo "All code/text has been appended to all_code.txt."
+### ./README.md ###
+# Finance Tracker
+
+Finance Tracker is a Python-based application designed to help users manage their personal finances by tracking payments, debts, balances, and transactions. The application uses SQLite for data storage and provides a command-line interface for interaction.
+
+## Project Structure
+
+```
+
+├── all_code.txt
+├── db
+│   └── finance_tracker.db
+├── problem.py
+├── sql
+│   └── create_tables.sql
+└── src
+    ├── __pycache__
+    ├── db_utils.py
+    ├── finance_utils.py
+    ├── init_data.py
+    ├── main.py
+    ├── scheduler.py
+    ├── transaction_utils.py
+    ├── verify_db.py
+    └── view_utils.py
+```
+
+## Setup Instructions
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone <repository-url>
+   cd finance-tracker
+   ```
+
+2. **Create a Virtual Environment**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
+
+3. **Install Dependencies**
+
+   Make sure you have the required packages installed. You can use pip to install them:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   *(Note: Create a `requirements.txt` file listing your project's dependencies, e.g., `colorama`, `tabulate`, `schedule`.)*
+
+4. **Initialize the Database**
+
+   Run the following command to set up the database:
+
+   ```bash
+   python src/db_utils.py
+   ```
+
+5. **Run the Application**
+
+   ```bash
+   python src/main.py
+   ```
+
+## Usage
+
+Once the application is running, you can perform various financial management tasks such as:
+
+- Adding payments, debts, balances, and transactions.
+- Viewing current balances and transactions.
+- Predicting shortfalls.
+- Calculating balance projections.
+
+### Main Menu Options
+
+- **Add Payment**: Record a new payment.
+- **Add Debt**: Record a new debt.
+- **Add Balance**: Add an account balance.
+- **Add Transaction**: Add a new financial transaction.
+- **Update Income and Charges**: Update income and unexpected charges.
+- **Predict Shortfalls**: Analyze and predict financial shortfalls.
+- **View Table Data**: View data from specific tables.
+- **Calculate Balance Projection**: Project future balances based on current data.
+- **View Balance After Payments**: See projected balances after payments.
+- **Update Existing Balance**: Update the balance of an existing account.
+- **View Balances**: View current account balances.
+
+## Contributing
+
+Contributions are welcome! If you have any suggestions, improvements, or bug fixes, please create a pull request or submit an issue.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Colorama](https://pypi.org/project/colorama/)
+- [Tabulate](https://pypi.org/project/tabulate/)
+- [Schedule](https://pypi.org/project/schedule/)### ./problem.py ###
+import os
+import subprocess
+
+# Path to the file
+file_path = "all_code.txt"
+
+# Delete the content of the file
+with open(file_path, "w") as file:
+    pass
+
+# Function to get multi-line input with a special end keyword
+def get_multiline_input(prompt):
+    print(prompt)
+    print("Type 'END' on a new line to finish.")
+    lines = []
+    while True:
+        line = input()
+        if line.strip().upper() == 'END':
+            break
+        lines.append(line)
+    return "\n".join(lines)
+
+# Get user input for the problem with the code
+problem_message = get_multiline_input("Enter the problem with the code:")
+
+# Write the problem message and introductory text to the top of the file
+with open(file_path, "a") as file:
+    file.write(f"{problem_message}\n\n")
+    file.write("Please analyze this project structure, description, and errors carefully in order to help me with the issue.\n\n")
+
+# # Append the content of README.md to the file
+# with open("README.md", "r") as readme_file:
+#     readme_content = readme_file.read()
+
+# with open(file_path, "a") as file:
+#     file.write("### README.md ###\n")
+#     file.write(readme_content)
+#     file.write("\n\n")
+
+# Append the output of the tree command to the file
+tree_output = subprocess.run(["tree"], capture_output=True, text=True)
+with open(file_path, "a") as file:
+    file.write(tree_output.stdout)
+    file.write("\n")
+
+# Define the Bash script content
+bash_script_content = """#!/bin/bash
+
+# Find and append relevant files to all_code.txt excluding .txt files and kubectl
+find . -type f \\( -name "*.go" -o -name "*.yaml" -o -name "*.yml" -o -name "*.md" -o -name "*.sh" -o -name "*.sql" -o -name "Jenkinsfile" -o -name "LICENSE" -o -name "dockerfile" -o -name "go.mod" -o -name "go.sum" -o -name "kubeconfig" -o -name "*.py" -o -name "*.log" \\) \\
+    -not -name "*.txt" \\
+    -not -name "kubectl" \\
+    -exec sh -c 'echo "### {} ###" >> all_code.txt && cat "{}" >> all_code.txt' \\;
+
+echo "All code/text has been appended to all_code.txt."
+"""
+
+# Write the Bash script content to a temporary file
+with open("append_code.sh", "w") as bash_script:
+    bash_script.write(bash_script_content)
+
+# Run the Bash script
+subprocess.run(["bash", "append_code.sh"])
+
+# Clean up the temporary Bash script
+os.remove("append_code.sh")
+
+# Copy the content of all_code.txt to the clipboard using pbcopy
+with open(file_path, "r") as file:
+    all_code_content = file.read()
+
+subprocess.run("pbcopy", text=True, input=all_code_content)
+
+print("All steps completed and all_code.txt has been updated and copied to clipboard.")
+### ./src/transaction_utils.py ###
+# src/transaction_utils.py
+
+import sqlite3
+import os
+from colorama import Fore, Style
+
+DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+
+def add_payment(description, amount, due_date, frequency):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO payments (description, amount, due_date, frequency) VALUES (?, ?, ?, ?)",
+                       (description, amount, due_date, frequency))
+        conn.commit()
+        conn.close()
+        print(Fore.GREEN + Style.BRIGHT + f"Payment added: {description}, Amount: {amount}, Due Date: {due_date}, Frequency: {frequency}")
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error adding payment: {e}")
+
+def add_debt(description, balance, credit_limit, due_date, min_payment, apr):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO debts (description, balance, credit_limit, due_date, min_payment, apr) VALUES (?, ?, ?, ?, ?, ?)",
+                       (description, balance, credit_limit, due_date, min_payment, apr))
+        conn.commit()
+        conn.close()
+        print(Fore.GREEN + Style.BRIGHT + f"Debt added: {description}, Balance: {balance}, Limit: {credit_limit}, Due Date: {due_date}, Min Payment: {min_payment}, APR: {apr}")
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error adding debt: {e}")
+
+def add_balance(description, amount):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO balances (description, amount) VALUES (?, ?)",
+                       (description, amount))
+        conn.commit()
+        conn.close()
+        print(Fore.GREEN + Style.BRIGHT + f"Balance added: {description}, Amount: {amount}")
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error adding balance: {e}")
+
+def add_transaction(description, amount, date):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO transactions (description, amount, date) VALUES (?, ?, ?)",
+                       (description, amount, date))
+        conn.commit()
+        conn.close()
+        print(Fore.GREEN + Style.BRIGHT + f"Transaction added: {description}, Amount: {amount}, Date: {date}")
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error adding transaction: {e}")
+
+def update_income_and_charges(new_income, sudden_charges):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Update income (add new transaction)
+        today = datetime.today().strftime('%Y-%m-%d')
+        add_transaction("Income", new_income, today)
+        
+        # Add sudden charges (add new transactions)
+        for charge in sudden_charges:
+            add_transaction(charge['description'], -charge['amount'], today)
+        
+        conn.close()
+        print(Fore.GREEN + Style.BRIGHT + f"Income and charges updated successfully: New Income: {new_income}, Charges: {sudden_charges}")
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error updating income and charges: {e}")
+
+def update_balance(description, amount):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("UPDATE balances SET amount = ? WHERE description = ?", (amount, description))
+        conn.commit()
+        conn.close()
+        print(Fore.GREEN + Style.BRIGHT + f"Balance updated: {description}, New Amount: {amount}")
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error updating balance: {e}")### ./src/view_utils.py ###
+# src/view_utils.py
+
+import sqlite3
+import os
+from colorama import Fore, Style
+from tabulate import tabulate
+
+DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+
+def view_table_data(table_name):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM {table_name}")
+        rows = cursor.fetchall()
+        headers = [description[0] for description in cursor.description]
+        print(Fore.CYAN + Style.BRIGHT + tabulate(rows, headers=headers, tablefmt="grid"))
+        conn.close()
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error viewing table {table_name}: {e}")
+
+def view_balances():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM balances")
+        rows = cursor.fetchall()
+        headers = [description[0] for description in cursor.description]
+        print(Fore.CYAN + Style.BRIGHT + tabulate(rows, headers=headers, tablefmt="grid"))
+        conn.close()
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error viewing balances: {e}")### ./src/verify_db.py ###
+# src/verify_db.py
+
+import sqlite3
+import os
+from colorama import Fore, Style
+from tabulate import tabulate
+
+DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+
+def view_table_structure(table_name):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    rows = cursor.fetchall()
+    headers = ["cid", "name", "type", "notnull", "dflt_value", "pk"]
+    print(Fore.CYAN + Style.BRIGHT + tabulate(rows, headers=headers, tablefmt="grid"))
+    conn.close()
+
+if __name__ == "__main__":
+    table_name = input("Enter table name to view its structure: ")
+    view_table_structure(table_name)
+### ./src/finance_utils.py ###
+import sqlite3
+from datetime import datetime, timedelta
+import os
+from colorama import Fore, Style  # Add this import
+
+DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+
+def calculate_balance_projection():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Get current balances
+        cursor.execute("SELECT amount FROM balances")
+        balances = cursor.fetchall()
+        total_balance = sum(balance[0] for balance in balances)
+        
+        # Get current payments
+        cursor.execute("SELECT amount, due_date FROM payments")
+        payments = cursor.fetchall()
+        
+        # Get current debts
+        cursor.execute("SELECT min_payment, due_date FROM debts")
+        debts = cursor.fetchall()
+        
+        # Aggregate all payments by due date
+        payment_dict = {}
+        for payment in payments:
+            if payment[1] not in payment_dict:
+                payment_dict[payment[1]] = 0
+            payment_dict[payment[1]] += payment[0]
+        
+        for debt in debts:
+            if debt[1] not in payment_dict:
+                payment_dict[debt[1]] = 0
+            payment_dict[debt[1]] += debt[0]
+        
+        # Calculate projected balance
+        today = datetime.today()
+        one_year_later = today + timedelta(days=365)
+        current_date = today
+        weekly_income = 275
+        
+        while current_date <= one_year_later:
+            # Add weekly income on the start of the week (assuming Monday)
+            if current_date.weekday() == 0:
+                total_balance += weekly_income
+            
+            # Subtract payments due on this day
+            if current_date.day in payment_dict:
+                total_balance -= payment_dict[current_date.day]
+            
+            print(f"Balance on {current_date.strftime('%Y-%m-%d')}: {round(total_balance, 2)}")
+            current_date += timedelta(days=1)
+        
+        conn.close()
+    except sqlite3.Error as e:
+        print(f"Error calculating balance projection: {e}")
+
+def view_balance_after_payments(up_to_date):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Get the balance of the Bank of America Checking Account
+        cursor.execute("SELECT amount FROM balances WHERE description = 'Bank of America Checking Account'")
+        boa_balance = cursor.fetchone()
+        if boa_balance:
+            total_balance = boa_balance[0]
+        else:
+            total_balance = 0
+
+        print(Fore.CYAN + Style.BRIGHT + f"Initial Total Balance: {total_balance}")
+
+        # Get current payments
+        cursor.execute("SELECT description, amount, due_date FROM payments")
+        payments = cursor.fetchall()
+        
+        # Get current debts
+        cursor.execute("SELECT description, min_payment, due_date FROM debts")
+        debts = cursor.fetchall()
+        
+        # Aggregate all payments by due date
+        payment_dict = {}
+        for payment in payments:
+            if payment[2] not in payment_dict:
+                payment_dict[payment[2]] = []
+            payment_dict[payment[2]].append(payment)
+        
+        for debt in debts:
+            if debt[2] not in payment_dict:
+                payment_dict[debt[2]] = []
+            payment_dict[debt[2]].append(debt)
+        
+        # Calculate balance up to the specified date
+        today = datetime.today()
+        target_date = datetime.strptime(up_to_date, "%Y-%m-%d")
+        current_date = today
+        weekly_income = 275
+        
+        while current_date <= target_date:
+            # Add weekly income on Sundays
+            if current_date.weekday() == 6:
+                total_balance += weekly_income
+                print(Fore.GREEN + Style.BRIGHT + f"Payment received on {current_date.strftime('%Y-%m-%d')}: Income, Amount: {round(weekly_income, 2)}")
+            
+            # Subtract payments due on this day
+            if current_date.day in payment_dict:
+                for payment in payment_dict[current_date.day]:
+                    total_balance -= payment[1]
+                    print(Fore.RED + Style.BRIGHT + f"Payment due on {current_date.strftime('%Y-%m-%d')}: {payment[0]}, Amount: {round(payment[1], 2)}")
+            
+            print(Fore.YELLOW + Style.BRIGHT + f"Balance on {current_date.strftime('%Y-%m-%d')}: {round(total_balance, 2)}")
+            current_date += timedelta(days=1)
+        
+        conn.close()
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error viewing balance after payments: {e}")
+
+def update_balances():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM balances")
+        balances = cursor.fetchall()
+        for balance in balances:
+            # Here you can add logic to update balances, e.g., apply interest to savings
+            new_amount = balance[2]
+            cursor.execute("UPDATE balances SET amount = ? WHERE id = ?", (new_amount, balance[0]))
+        conn.commit()
+        conn.close()
+        print("Balances updated successfully")
+    except sqlite3.Error as e:
+        print(f"Error updating balances: {e}")
+
+def predict_shortfalls():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Get current balances
+        cursor.execute("SELECT amount FROM balances")
+        balances = cursor.fetchall()
+        total_balance = sum(balance[0] for balance in balances)
+        
+        # Get current payments
+        cursor.execute("SELECT description, amount, due_date FROM payments")
+        payments = cursor.fetchall()
+        
+        # Get current debts
+        cursor.execute("SELECT description, min_payment, due_date FROM debts")
+        debts = cursor.fetchall()
+        
+        # Calculate shortfalls
+        shortfalls = []
+        for payment in payments:
+            if total_balance < payment[1]:
+                shortfalls.append(payment)
+        
+        for debt in debts:
+            if total_balance < debt[1]:
+                shortfalls.append(debt)
+        
+        # Display shortfalls
+        if shortfalls:
+            print("Upcoming shortfalls:")
+            for shortfall in shortfalls:
+                print(f"{shortfall[0]}: {shortfall[1]}")
+        else:
+            print("No upcoming shortfalls.")
+        
+        conn.close()
+    except sqlite3.Error as e:
+        print(f"Error predicting shortfalls: {e}")
+### ./src/scheduler.py ###
+# src/scheduler.py
+
+import schedule
+import time
+from finance_utils import update_balances
+
+# Schedule daily updates
+schedule.every().day.at("00:00").do(update_balances)
+
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    run_scheduler()
+### ./src/db_utils.py ###
+import sqlite3
+import os
+
+def initialize_database(db_path, sql_path):
+    # Get the absolute paths
+    abs_db_path = os.path.abspath(db_path)
+    abs_sql_path = os.path.abspath(sql_path)
+    
+    # Create the database directory if it doesn't exist
+    os.makedirs(os.path.dirname(abs_db_path), exist_ok=True)
+    
+    # Connect to the database
+    conn = sqlite3.connect(abs_db_path)
+    cursor = conn.cursor()
+    
+    with open(abs_sql_path, 'r') as f:
+        cursor.executescript(f.read())
+    
+    conn.commit()
+    conn.close()
+
+if __name__ == "__main__":
+    db_path = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+    sql_path = os.path.join(os.path.dirname(__file__), '../sql/create_tables.sql')
+    initialize_database(db_path, sql_path)
+### ./src/main.py ###
+# src/main.py
+
+import schedule
+import time
+from finance_utils import calculate_balance_projection, view_balance_after_payments, update_balances, predict_shortfalls
+from transaction_utils import add_payment, add_debt, add_balance, add_transaction, update_income_and_charges, update_balance
+from view_utils import view_table_data, view_balances
+from init_data import initialize_data
+from colorama import init, Fore, Style
+from tabulate import tabulate
+
+init(autoreset=True)
+
+def print_menu():
+    menu_options = [
+        ["1", "Add Payment"],
+        ["2", "Add Debt"],
+        ["3", "Add Balance"],
+        ["4", "Add Transaction"],
+        ["5", "Update Income and Charges"],
+        ["6", "Predict Shortfalls"],
+        ["7", "View Table Data"],
+        ["8", "Calculate Balance Projection"],
+        ["9", "View Balance After Payments"],
+        ["10", "Update Existing Balance"],
+        ["11", "View Balances"],
+        ["12", "Exit"]
+    ]
+    print(Fore.CYAN + Style.BRIGHT + tabulate(menu_options, headers=["Option", "Action"], tablefmt="grid"))
+
+def main():
+    # Initialize and schedule tasks
+    schedule.every().day.at("00:00").do(update_balances)
+
+    # Add initial data
+    initialize_data()
+
+    while True:
+        print(Fore.GREEN + Style.BRIGHT + "\nPlease choose an option from the menu:")
+        print_menu()
+        choice = input(Fore.YELLOW + "Enter your choice: ")
+
+        if choice == '1':
+            description = input("Enter description: ")
+            amount = float(input("Enter amount: "))
+            due_date = int(input("Enter due date (day of the month): "))
+            frequency = input("Enter frequency (e.g., 'monthly'): ")
+            add_payment(description, amount, due_date, frequency)
+        elif choice == '2':
+            description = input("Enter description: ")
+            balance = float(input("Enter balance: "))
+            credit_limit = float(input("Enter credit limit: "))
+            due_date = int(input("Enter due date (day of the month): "))
+            min_payment = float(input("Enter minimum payment: "))
+            apr = float(input("Enter APR: "))
+            add_debt(description, balance, credit_limit, due_date, min_payment, apr)
+        elif choice == '3':
+            description = input("Enter description: ")
+            amount = float(input("Enter amount: "))
+            add_balance(description, amount)
+        elif choice == '4':
+            description = input("Enter description: ")
+            amount = float(input("Enter amount: "))
+            date = input("Enter date (YYYY-MM-DD): ")
+            add_transaction(description, amount, date)
+        elif choice == '5':
+            new_income = float(input("Enter new income: "))
+            sudden_charges = []
+            while True:
+                charge_description = input("Enter charge description (or 'done' to finish): ")
+                if charge_description.lower() == 'done':
+                    break
+                charge_amount = float(input("Enter charge amount: "))
+                sudden_charges.append({'description': charge_description, 'amount': charge_amount})
+            update_income_and_charges(new_income, sudden_charges)
+        elif choice == '6':
+            predict_shortfalls()
+        elif choice == '7':
+            table_name = input("Enter table name (payments, debts, balances, transactions): ")
+            view_table_data(table_name)
+        elif choice == '8':
+            calculate_balance_projection()
+        elif choice == '9':
+            up_to_date = input("Enter the date up to which you want to see the balance (YYYY-MM-DD): ")
+            view_balance_after_payments(up_to_date)
+        elif choice == '10':
+            description = input("Enter the description of the balance to update: ")
+            amount = float(input("Enter the new amount: "))
+            update_balance(description, amount)
+        elif choice == '11':
+            view_balances()
+        elif choice == '12':
+            break
+        else:
+            print(Fore.RED + "Invalid choice. Please try again.")
+        
+        print(Fore.MAGENTA + "\nRunning scheduled tasks...")
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
+### ./src/init_data.py ###
+# src/init_data.py
+
+from transaction_utils import add_payment, add_debt, add_balance
+import sqlite3
+import os
+
+DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+
+def delete_records_and_reset_autoincrement(table):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM {table}")
+    cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table}'")
+    conn.commit()
+    conn.close()
+
+def initialize_data():
+    print("Let's set up your financial data.")
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    # Clear existing data
+    for table in ['payments', 'debts', 'balances']:
+        delete_records_and_reset_autoincrement(table)
+
+    # Add Payments
+    payments = []
+    print("Enter your payment details. Type 'done' to finish.")
+    while True:
+        description = input("Payment Description (or 'done' to stop): ")
+        if description.lower() == 'done':
+            break
+        amount = float(input("Amount: "))
+        due_date = int(input("Due date (day of month): "))
+        frequency = input("Frequency (e.g., 'monthly'): ")
+        payments.append((description, amount, due_date, frequency))
+
+    for payment in payments:
+        add_payment(*payment)
+
+    # Add Debts
+    debts = []
+    print("Enter your debt details. Type 'done' to finish.")
+    while True:
+        description = input("Debt Description (or 'done' to stop): ")
+        if description.lower() == 'done':
+            break
+        balance = float(input("Balance: "))
+        credit_limit = float(input("Credit limit: "))
+        due_date = int(input("Due date (day of month): "))
+        min_payment = float(input("Minimum payment: "))
+        apr = float(input("APR: "))
+        debts.append((description, balance, credit_limit, due_date, min_payment, apr))
+
+    for debt in debts:
+        add_debt(*debt)
+
+    # Add Balances
+    balances = []
+    print("Enter your balance details. Type 'done' to finish.")
+    while True:
+        description = input("Account Description (or 'done' to stop): ")
+        if description.lower() == 'done':
+            break
+        amount = float(input("Amount: "))
+        balances.append((description, amount))
+
+    for balance in balances:
+        add_balance(*balance)
+
+    conn.close()
+
+if __name__ == "__main__":
+    initialize_data()
+### ./sql/create_tables.sql ###
+-- sql/create_tables.sql
+
+-- payments table
+CREATE TABLE payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    amount REAL NOT NULL,
+    due_date INTEGER NOT NULL,
+    frequency TEXT NOT NULL
+);
+
+-- debts table
+CREATE TABLE debts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    balance REAL NOT NULL,
+    credit_limit REAL NOT NULL,
+    due_date INTEGER NOT NULL,
+    min_payment REAL NOT NULL,
+    apr REAL NOT NULL
+);
+
+-- balances table
+CREATE TABLE balances (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    amount REAL NOT NULL
+);
+
+-- transactions table
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    amount REAL NOT NULL,
+    date TEXT NOT NULL
+);
