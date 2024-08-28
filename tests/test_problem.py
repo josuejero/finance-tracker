@@ -16,7 +16,7 @@ def get_multiline_input(prompt):
     while True:
         line = input()
         if line.strip().upper() == 'END':
-            break
+            break;
         lines.append(line)
     return "\n".join(lines)
 
@@ -37,8 +37,8 @@ with open(file_path, "a") as file:
 #     file.write(readme_content)
 #     file.write("\n\n")
 
-# Append the output of the tree command to the file
-tree_output = subprocess.run(["tree"], capture_output=True, text=True)
+# Append the output of the tree command to the file, excluding the 'venv' folder
+tree_output = subprocess.run(["tree", "-I", "venv"], capture_output=True, text=True)
 with open(file_path, "a") as file:
     file.write(tree_output.stdout)
     file.write("\n")
@@ -46,10 +46,11 @@ with open(file_path, "a") as file:
 # Define the Bash script content
 bash_script_content = """#!/bin/bash
 
-# Find and append relevant files to all_code.txt excluding .txt files and kubectl
+# Find and append relevant files to all_code.txt excluding .txt files and kubectl, and excluding the venv directory
 find . -type f \\( -name "*.go" -o -name "*.yaml" -o -name "*.yml" -o -name "*.md" -o -name "*.sh" -o -name "*.sql" -o -name "Jenkinsfile" -o -name "LICENSE" -o -name "dockerfile" -o -name "go.mod" -o -name "go.sum" -o -name "kubeconfig" -o -name "*.py" -o -name "*.log" \\) \\
     -not -name "*.txt" \\
     -not -name "kubectl" \\
+    -not -path "./venv/*" \\
     -exec sh -c 'echo "### {} ###" >> all_code.txt && cat "{}" >> all_code.txt' \\;
 
 echo "All code/text has been appended to all_code.txt."

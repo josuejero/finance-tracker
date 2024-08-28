@@ -1,8 +1,11 @@
 # src/init_data.py
 
-from transaction_utils import add_payment, add_debt, add_balance
 import sqlite3
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
+from utils.transaction_utils import add_payment, add_debt, add_balance, add_transaction, update_income_and_charges, update_balance
+
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
 

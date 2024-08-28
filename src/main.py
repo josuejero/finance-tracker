@@ -1,10 +1,13 @@
 # src/main.py
 
 import schedule
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
 import time
-from finance_utils import calculate_balance_projection, view_balance_after_payments, update_balances, predict_shortfalls
-from transaction_utils import add_payment, add_debt, add_balance, add_transaction, update_income_and_charges, update_balance
-from view_utils import view_table_data, view_balances
+from utils.finance_utils import calculate_balance_projection, view_balance_after_payments, update_balances, predict_shortfalls
+from utils.transaction_utils import add_payment, add_debt, add_balance, add_transaction, update_income_and_charges, update_balance
+from utils.view_utils import view_table_data, view_balances
 from init_data import initialize_data
 from colorama import init, Fore, Style
 from tabulate import tabulate
