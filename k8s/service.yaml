@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: finance-tracker-service
+  namespace: production
+  labels:
+    app: finance-tracker
+spec:
+  selector:
+    app: finance-tracker
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

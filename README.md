@@ -1,102 +1,164 @@
-# Finance Tracker
+# Finance Tracker Application
 
-Finance Tracker is a Python-based application designed to help users manage their personal finances by tracking payments, debts, balances, and transactions. The application uses SQLite for data storage and provides a command-line interface for interaction.
+## Overview
 
-## Project Structure
+**Finance Tracker** is a web application designed to help users manage their personal finances by tracking payments, debts, balances, and transactions. Built with **Django**, the application allows users to easily input financial information, predict potential shortfalls, and calculate projected balances over time. The project also includes **Celery** for background task processing, and it's containerized for easy deployment via **Docker** and **Kubernetes**.
 
+## Features
+
+- **Track Payments, Debts, and Balances**: Record and manage recurring payments, debts, and account balances.
+- **Balance Projection**: Calculate projected balances based on income, expenses, and future payments.
+- **Shortfall Prediction**: Predict when a user's balance will fall short based on upcoming expenses.
+- **Celery Background Tasks**: Automatically update balances in the background using Celery.
+- **Scalable Deployment**: Easily deploy the application with Docker and Kubernetes, including horizontal scaling via Kubernetes Horizontal Pod Autoscaler (HPA).
+
+## Technology Stack
+
+- **Backend**: Python, Django, Celery
+- **Frontend**: Django Templates
+- **Database**: SQLite (for development), PostgreSQL (recommended for production)
+- **Task Processing**: Celery with Redis as the message broker
+- **Containerization**: Docker, Kubernetes
+- **CI/CD**: Jenkins pipeline for continuous integration and deployment
+- **Secret Management**: Google Cloud Secret Manager for securely storing credentials
+
+## Prerequisites
+
+To run the project locally, you'll need:
+
+- **Python 3.9+**
+- **Docker** (for containerized deployment)
+- **Kubernetes CLI** (`kubectl`) and a Kubernetes cluster (for production deployments)
+- **Redis** (for Celery task queue)
+- **PostgreSQL** (recommended for production environments)
+- **Jenkins** (for CI/CD pipeline)
+- **Google Cloud Account** (for secret management and deployment to GCP)
+
+## Installation and Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/josuejero/finance-tracker.git
+cd finance-tracker
 ```
 
-├── all_code.txt
-├── db
-│   └── finance_tracker.db
-├── problem.py
-├── sql
-│   └── create_tables.sql
-└── src
-    ├── __pycache__
-    ├── db_utils.py
-    ├── finance_utils.py
-    ├── init_data.py
-    ├── main.py
-    ├── scheduler.py
-    ├── transaction_utils.py
-    ├── verify_db.py
-    └── view_utils.py
+### 2. Set Up a Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate
 ```
 
-## Setup Instructions
+### 3. Install Dependencies
 
-1. **Clone the Repository**
+```bash
+pip install -r requirements.txt
+```
 
-   ```bash
-   git clone https://github.com/josuejero/finance-tracker
-   cd finance-tracker
-   ```
+### 4. Configure Environment Variables
 
-2. **Create a Virtual Environment**
+Create a `.env` file in the project root and add the following:
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
+```bash
+SECRET_KEY=your-django-secret-key
+DATABASE_URL=your-database-url
+OAUTH_CLIENT_ID=your-google-oauth-client-id
+OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
+REDIS_URL=your-redis-url
+ENCRYPTION_KEY=your-encryption-key
+```
 
-3. **Install Dependencies**
+### 5. Apply Migrations
 
-   Make sure you have the required packages installed. You can use pip to install them:
+```bash
+python manage.py migrate
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 6. Run the Development Server
 
-   *(Note: Create a `requirements.txt` file listing your project's dependencies, e.g., `colorama`, `tabulate`, `schedule`.)*
+```bash
+python manage.py runserver
+```
 
-4. **Initialize the Database**
+### 7. Running Celery for Background Tasks
 
-   Run the following command to set up the database:
+Start the Celery worker:
 
-   ```bash
-   python src/db_utils.py
-   ```
+```bash
+celery -A finance_tracker_django worker --loglevel=info
+```
 
-5. **Run the Application**
+### 8. Running Redis (for Celery)
 
-   ```bash
-   python src/main.py
-   ```
+Make sure Redis is running on your local machine or via Docker:
 
-## Usage
+```bash
+docker run -d -p 6379:6379 redis
+```
 
-Once the application is running, you can perform various financial management tasks such as:
+## Docker Setup
 
-- Adding payments, debts, balances, and transactions.
-- Viewing current balances and transactions.
-- Predicting shortfalls.
-- Calculating balance projections.
+### 1. Build the Docker Image
 
-### Main Menu Options
+```bash
+docker build -t finance-tracker .
+```
 
-- **Add Payment**: Record a new payment.
-- **Add Debt**: Record a new debt.
-- **Add Balance**: Add an account balance.
-- **Add Transaction**: Add a new financial transaction.
-- **Update Income and Charges**: Update income and unexpected charges.
-- **Predict Shortfalls**: Analyze and predict financial shortfalls.
-- **View Table Data**: View data from specific tables.
-- **Calculate Balance Projection**: Project future balances based on current data.
-- **View Balance After Payments**: See projected balances after payments.
-- **Update Existing Balance**: Update the balance of an existing account.
-- **View Balances**: View current account balances.
+### 2. Run the Docker Container
+
+```bash
+docker run -p 8000:8000 --env-file .env finance-tracker
+```
+
+## Kubernetes Setup
+
+### 1. Deploy to Kubernetes
+
+To deploy to a Kubernetes cluster, ensure you have `kubectl` configured for your cluster and apply the Kubernetes manifests:
+
+```bash
+kubectl apply -f k8s/
+```
+
+### 2. Horizontal Pod Autoscaling
+
+The application is configured to scale horizontally using Kubernetes HPA. Ensure metrics server is installed on your cluster and apply the HPA configuration:
+
+```bash
+kubectl apply -f k8s/hpa.yaml
+```
+
+## Continuous Integration and Deployment (CI/CD)
+
+A **Jenkinsfile** is included for CI/CD. Configure Jenkins with appropriate credentials (e.g., `GOOGLE_PROJECT_ID`, `OAUTH_CLIENT_ID`, and `OAUTH_CLIENT_SECRET`) to automate the following stages:
+
+- **Build**: Builds the Docker image.
+- **Test**: Runs the Django tests.
+- **Deploy**: Deploys the application to a Kubernetes cluster.
+
+## Running Tests
+
+To run the tests locally:
+
+```bash
+python manage.py test
+```
+
+Or, using Docker:
+
+```bash
+docker-compose run web python manage.py test
+```
+
+## Security
+
+This project uses **Google Cloud Secret Manager** to securely handle sensitive credentials such as OAuth tokens and the database URL. Ensure that the necessary secrets are created in Google Cloud and available to the application.
 
 ## Contributing
 
-Contributions are welcome! If you have any suggestions, improvements, or bug fixes, please create a pull request or submit an issue.
+Contributions are welcome! Please fork this repository, make your changes, and submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Colorama](https://pypi.org/project/colorama/)
-- [Tabulate](https://pypi.org/project/tabulate/)
-- [Schedule](https://pypi.org/project/schedule/)
+This project is licensed under the [MIT License](LICENSE).

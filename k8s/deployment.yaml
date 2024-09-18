@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-tracker
+  namespace: default
+  labels:
+    app: finance-tracker
+    environment: staging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: finance-tracker
+      environment: staging
+  template:
+    metadata:
+      labels:
+        app: finance-tracker
+        environment: staging
+    spec:
+      containers:
+        - name: finance-tracker
+          image: gcr.io/${{ env.GOOGLE_PROJECT_ID }}/finance-tracker:${{ env.BUILD_TAG }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: finance-tracker-secrets
+                  key: DATABASE_URL
+            - name: OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: finance-tracker-secrets
+                  key: OAUTH_CLIENT_ID
+            - name: OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: finance-tracker-secrets
+                  key: OAUTH_CLIENT_SECRET
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "400m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3

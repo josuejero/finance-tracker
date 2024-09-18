@@ -1,26 +1,37 @@
-# Use the official Python image from Docker Hub
-FROM python:3.9-slim
+FROM python:3.9.16-slim AS build
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --upgrade pip wheel \
+    && pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.9.16-slim
+
+WORKDIR /app
+
+COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=build /usr/local/bin /usr/local/bin
+
 COPY . /app
 
-# Upgrade pip and install the wheel package
-RUN pip3 install --upgrade pip wheel
-
-# Set the PYTHONPATH environment variable to include the src directory
 ENV PYTHONPATH=/app/src
 
-# Install any dependencies specified in requirements.txt
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
 
-# Make sure the SQLite database is copied if needed
-COPY ./database/finance_tracker.db /app/database/
+COPY --chown=appuser:appgroup ./database/finance_tracker.db /app/database/
 
-# Expose port (if your app requires it)
-EXPOSE 5000
+ARG PORT=5000
+ENV PORT=${PORT}
+EXPOSE ${PORT}
 
-# Command to run your application
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl --fail http://localhost:${PORT}/health || exit 1
+
 CMD ["python", "src/main.py"]

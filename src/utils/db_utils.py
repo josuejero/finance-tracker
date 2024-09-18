@@ -1,25 +1,55 @@
-import sqlite3
+import psycopg2
 import os
+import logging
+from cryptography.fernet import Fernet
 
-def initialize_database(db_path, sql_path):
-    # Get the absolute paths
-    abs_db_path = os.path.abspath(db_path)
-    abs_sql_path = os.path.abspath(sql_path)
-    
-    # Create the database directory if it doesn't exist
-    os.makedirs(os.path.dirname(abs_db_path), exist_ok=True)
-    
-    # Connect to the database
-    conn = sqlite3.connect(abs_db_path)
-    cursor = conn.cursor()
-    
-    with open(abs_sql_path, 'r') as f:
-        cursor.executescript(f.read())
-    
-    conn.commit()
-    conn.close()
+def initialize_database(db_url, sql_path):
+    try:
+        conn = psycopg2.connect(db_url)
+        cursor = conn.cursor()
+        with open(sql_path, 'r') as f:
+            cursor.execute(f.read())
+        conn.commit()
+    except Exception as e:
+        logging.error(f"Database initialization error: {e}")
+        raise
+    finally:
+        conn.close()
 
-if __name__ == "__main__":
-    db_path = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
-    sql_path = os.path.join(os.path.dirname(__file__), '../sql/create_tables.sql')
-    initialize_database(db_path, sql_path)
+def encrypt_token(token):
+    key = os.getenv('ENCRYPTION_KEY')
+    cipher = Fernet(key)
+    return cipher.encrypt(token.encode())
+
+def decrypt_token(encrypted_token):
+    key = os.getenv('ENCRYPTION_KEY')
+    cipher = Fernet(key)
+    return cipher.decrypt(encrypted_token).decode()
+
+def save_oauth_token(token):
+    try:
+        encrypted_token = encrypt_token(token['access_token'])
+        conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO user_oauth_tokens (user_id, access_token) VALUES (%s, %s)", (1, encrypted_token))
+        conn.commit()
+    except Exception as e:
+        logging.error(f"Error saving OAuth token: {e}")
+        raise
+    finally:
+        conn.close()
+
+def get_oauth_token():
+    try:
+        conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+        cursor = conn.cursor()
+        cursor.execute("SELECT access_token FROM user_oauth_tokens WHERE user_id = %s", (1,))
+        result = cursor.fetchone()
+        if result:
+            return decrypt_token(result[0])
+    except Exception as e:
+        logging.error(f"Error retrieving OAuth token: {e}")
+        raise
+    finally:
+        conn.close()
+    return None

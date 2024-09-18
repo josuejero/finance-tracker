@@ -1,33 +1,27 @@
-# src/init_data.py
-
 import sqlite3
 import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
-from utils.transaction_utils import add_payment, add_debt, add_balance, add_transaction, update_income_and_charges, update_balance
+from utils.transaction_utils import add_payment, add_debt, add_balance
+import logging
 
-
-DB_PATH = os.path.join(os.path.dirname(__file__), '../db/finance_tracker.db')
+DB_PATH = os.getenv("DB_PATH", "../db/finance_tracker.db")
 
 def delete_records_and_reset_autoincrement(table):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute(f"DELETE FROM {table}")
-    cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table}'")
-    conn.commit()
-    conn.close()
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(f"DELETE FROM {table}")
+            cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table}'")
+            conn.commit()
+    except sqlite3.Error as e:
+        logging.error(f"Error resetting table {table}: {e}")
+        raise
 
 def initialize_data():
     print("Let's set up your financial data.")
-
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    # Clear existing data
+    
     for table in ['payments', 'debts', 'balances']:
         delete_records_and_reset_autoincrement(table)
 
-    # Add Payments
     payments = []
     print("Enter your payment details. Type 'done' to finish.")
     while True:
@@ -35,14 +29,13 @@ def initialize_data():
         if description.lower() == 'done':
             break
         amount = float(input("Amount: "))
-        due_date = int(input("Due date (day of month): "))
+        due_date = input("Due date (YYYY-MM-DD): ")
         frequency = input("Frequency (e.g., 'monthly'): ")
         payments.append((description, amount, due_date, frequency))
 
     for payment in payments:
         add_payment(*payment)
 
-    # Add Debts
     debts = []
     print("Enter your debt details. Type 'done' to finish.")
     while True:
@@ -51,7 +44,7 @@ def initialize_data():
             break
         balance = float(input("Balance: "))
         credit_limit = float(input("Credit limit: "))
-        due_date = int(input("Due date (day of month): "))
+        due_date = input("Due date (YYYY-MM-DD): ")
         min_payment = float(input("Minimum payment: "))
         apr = float(input("APR: "))
         debts.append((description, balance, credit_limit, due_date, min_payment, apr))
@@ -59,7 +52,6 @@ def initialize_data():
     for debt in debts:
         add_debt(*debt)
 
-    # Add Balances
     balances = []
     print("Enter your balance details. Type 'done' to finish.")
     while True:
@@ -71,8 +63,6 @@ def initialize_data():
 
     for balance in balances:
         add_balance(*balance)
-
-    conn.close()
 
 if __name__ == "__main__":
     initialize_data()

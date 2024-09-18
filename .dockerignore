@@ -6,3 +6,9 @@ __pycache__/
 .vscode/
 .git/
 .env
+venv
+__pycache__
+.git
+.dockerignore
+.DS_Store
+node_modules

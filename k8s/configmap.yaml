@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finance-tracker-config
+data:
+  DJANGO_SETTINGS_MODULE: "finance_tracker.settings"
+  ALLOWED_HOSTS: "localhost,127.0.0.1"
